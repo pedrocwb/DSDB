@@ -1,0 +1,97 @@
+---
+title: "Avaliação: Ajuste de modelo não linear"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Pedro Moreira Neto, Tatiane Alves
+
+### Dados
+Os dados fornecidos para o desenvolvimento deste trabalho apresenta o número de *views* e *inscritos* desde o dia de sua abertura para dois canais de sucesso do youtube (Invento na hora e Voce Sabia?.
+
+```{r data}
+data <- read.csv("youtube.txt", sep = " ", header = TRUE)
+head(data)
+```
+
+```{r}
+summary(data)
+```
+### Objetivo
+  O objetivo deste trabalho é predizer o número **acumulado** de inscritos em cada um destes canais para os próximos 365 dias. Sabendo disso, iremos modelar cada canal individualmente, para tal, é feita a divisão da base de dados conforme cada canal.  
+
+```{r}
+inventonahora <- data[data$CANAL == "inventonahora", ]
+vocesabia     <- data[data$CANAL == "vocesabia", ]
+```
+
+  Uma vez que queremos prever a quantidade acumulada de inscritos no canal, criamos uma nova variável para conter essas informação.
+```{r}
+factor <- 100000
+inventonahora$INSCR_CUMSUM  <- cumsum(inventonahora$INSCRITOS/factor)
+vocesabia$INSCR_CUMSUM      <- cumsum(vocesabia$INSCRITOS/factor)
+```
+
+
+O modelo a ser minimizado é o modelo logístico de crescimento de bactérias e que se caracteriza pela função:
+$$y = \frac{L}{1 + \exp(\beta( x - \beta0) )}$$
+
+onde L é o valor máximo da curva, $\beta0$ é o valor de *x* no ponto médio da curva e $\beta$ é a declividade da curva. E a função de perda escolhida para realizar esse minimização foi a perda quadrática que é dado pelo somotarório do quadrado da diferenca entre o valores reais e os previstos:
+$$\sum_{i=i}^n (y - \mu)^2 $$
+
+Em R, o modelo logístico com a função de perda quadrática pode ser implementado da seguinte maneira.
+```{r}
+f_logistic <- function(par, dias, insc){
+  mu <- par[1] / (1 + exp(par[2] * ( dias - par[3])))
+  SQ_logit <- sum( (insc - mu)^2 )
+  return(SQ_logit)
+}
+```
+
+
+#### Otimização e previsão para o canal Invento Na Hora.
+Para cada canal iremos minimizar a função descrita acima de forma que possamos encontrar um modelo que melhor se ajustes aos dados. Para alcançar nosso objetivo, faremos uso da função de otimização implementada no R **optim**. Essa instrução recebe qual função será minizada, ou maximizada dependendo do problema, um conjunto de parâmetros pertinentes a função logística e devolve os betas e o erro mínimo que conseguiu encontrar.
+```{r}
+logisticMinimization <- optim(par = c(round(max(inventonahora$INSCR_CUMSUM)), 0, mean(inventonahora$INSCR_CUMSUM)), 
+             fn = f_logistic, dias = inventonahora$DIAS, insc = inventonahora$INSCR_CUMSUM)
+logisticMinimization
+```
+
+
+Dados os pesos obtidos pela minimização da função, aplicamos eles nos dados em vista de prever qual será o número de inscritos acumulados no periodo de um ano e plotamos o resultado.
+
+No gráfico abaixo observa-se o comportamento do dado real descrito pela linha preta e o ajuste do modelo nesses dados caracterizado pela linha vermelha. Destaca-se que a continuação da linha vermelha representa a previsão de como este canal irá se comportar nos próximos 365 dias.  A previsão demonstra que o canal está crescendo mas num ritmo mais lento que nos meses anteriores. 
+```{r}
+dias <- seq(min(inventonahora$DIAS), max(inventonahora$DIAS) + 365, by=1)
+preds <- logisticMinimization$par[1] / (1 + exp(logisticMinimization$par[2] * ( dias - logisticMinimization$par[3])))
+
+plot(dias, preds,col="Red", type = "l")
+lines(inventonahora$DIAS, inventonahora$INSCR_CUMSUM)
+abline(v=max(inventonahora$DIAS))
+```
+
+#### Otimização e previsão para o canal Voce Sabia?
+Semelhante ao canal **Invento Na Hora** iremos otimizar o modelo lógistico com base nos dados do canal **Voce Sabia?**. A otimização do modelo e previsão é dada pelo trecho de código abaixo.
+```{r}
+ols <- optim(par = c(round(max(vocesabia$INSCR_CUMSUM)), 0, mean(vocesabia$INSCR_CUMSUM)), 
+             fn = f_logistic, dias = vocesabia$DIAS, insc = vocesabia$INSCR_CUMSUM)
+
+
+dias <- seq(min(vocesabia$DIAS), max(vocesabia$DIAS) + 365, by=1)
+preditos <- ols$par[1] / (1 + exp(ols$par[2] * ( dias - ols$par[3])))
+```
+
+Como podemos ver no gráfico abaixo, ao contrário do canal Invento na Hora, o ajuste do modelos nos dados nos informa que este canal apesar de novo é provável que tenha um crescimento rápido no número de inscritos.  
+ 
+```{r}
+plot(dias, preditos,col="Red", type = "l")
+lines(vocesabia$DIAS, vocesabia$INSCR_CUMSUM)
+abline(v=max(vocesabia$DIAS))
+```
+
+
+
+
+
