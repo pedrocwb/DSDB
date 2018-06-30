@@ -1,12 +1,3 @@
-#
-#    @Author: Pedro Martins Moreira Neto
-#    @email: pedromartins.cwb@gmail.com
-#
-#    Cálculo do número PI com multiprocessos utilizando comunicação interprocessos através de PIPES.
-
-
-
-
 from multiprocessing import Process, Pipe, current_process
 import time
 

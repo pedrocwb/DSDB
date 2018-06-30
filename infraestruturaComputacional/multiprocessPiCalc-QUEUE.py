@@ -1,10 +1,3 @@
-#
-#    @Author: Pedro Martins Moreira Neto
-#    @email: pedromartins.cwb@gmail.com
-#
-#    Cálculo do número PI com multiprocessos utilizando comunicação interprocessos através de QUEUES.
-
-
 from multiprocessing import Process, Queue ,current_process
 import time, itertools
 

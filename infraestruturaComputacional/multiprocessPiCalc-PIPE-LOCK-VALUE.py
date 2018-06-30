@@ -38,8 +38,5 @@ def main(PROCS=4, num_steps=10000000):
     
 
 
-    
 
-if __name__ == '__main__':
-    args = sys.argv
-    main(int(args[1]), int(args[2]))
+main()
