@@ -3,6 +3,7 @@ import multiprocessing
 from multiprocessing import Process, Pipe, current_process, Value
 import time
 
+
 def worker(pi, start, end, step):
     summ = 0.0
 
