@@ -16,7 +16,7 @@ def pi(start, end, step):
 
 if __name__ == '__main__':
 	
-	num_steps = 100000000 #100.000.000
+	num_steps = 10000000 #100.000.000
 	step = 1.0 / num_steps
 	n = 6
 	procs = []
