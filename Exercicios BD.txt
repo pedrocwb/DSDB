@@ -1,0 +1,151 @@
+ESPECIALIZAÇÃO BIG DATA E DATA SCIENCE
+PEDRO MARTINS MOREIRA NETO
+
+AULA 1) 
+    EX 1:
+        SELECT * FROM nation;
+    
+    EX 2: 
+        SELECT n_comment, n_name FROM nation;
+
+    EX 3:
+        SELECT o_orderpriority FROM orders;
+
+    EX 4:
+        SELECT l_discount FROM lineitem;
+    
+    EX 5:
+        Qual/quais as consultas executadas corretamente:
+        1. select * from nation; 
+    
+    EX 6:
+        2. select n_name from nation;
+        3. select r_name, r_comment from region;
+        4. select p_name, 12 * p_retailprice from part; 
+    
+    EX 7:
+        SELECT p_name || '--' || p_type as "Nome e Tipo" from part;
+    
+
+AULA 2)
+    EX 1:
+        SELECT p_name, p_retailprice 
+        FROM part
+        WHERE p_retailprice > 2097.10;
+    
+    EX 2:
+        SELECT n_comment FROM nation WHERE n_name = 'ARGENTINA';
+    
+    EX 3:
+        SELECT p_name, p_retailprice 
+        FROM part
+        WHERE p_retailprice BETWEEN 2095.10 AND 2097.90;
+
+    EX 4:
+        SELECT l_discount 
+        FROM lineitem
+        WHERE l_receiptdate BETWEEN '1998-12-27' AND '1998-12-31';
+
+    EX 4:
+        SELECT c_name, c_address
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990;
+
+    EX 5:
+        SELECT c_name, c_address
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990
+        AND c_mktsegment like '%AUTO%';        
+
+    EX 6:
+        SELECT c_name, c_address
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990
+        AND (c_mktsegment like '%AUTO%' OR c_mktsegment like 'MAC%') ;
+    
+    EX 7:
+        SELECT * FROM nation WHERE n_name NOT LIKE '%A%';
+    
+    EX 8:
+        SELECT * FROM nation WHERE n_name LIKE '_A%';
+
+
+AULA 3)
+    EX 1:
+        SELECT current_date;
+
+    EX 2:
+        SELECT c_name, sqrt(c_acctbal)
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990;
+    
+    EX 3:
+        SELECT c_name, round(sqrt(c_acctbal), 2) as valor
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990;
+
+    EX 4:
+        SELECT 
+            c_name, 
+            round(sqrt(c_acctbal), 2) as valor,
+            length(c_comment) 
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990;
+
+    EX 5: 
+        SELECT 
+            c_name, 
+            c_phone, 
+            to_number(c_phone, '999999999999')
+        FROM customer
+        WHERE c_nationkey = 24
+        AND c_acctbal > 9990;
+
+
+
+AULA 4)
+    EX 1:
+
+        SELECT p_name, p_retailprice, ps_supplycost
+        FROM part, partsupp
+        WHERE part.p_partkey = partsupp.ps_partkey
+        AND p_retailprice > 2097.10;
+
+    EX 2:
+
+        SELECT o.o_orderstatus, l.l_discount
+        FROM orders o, lineitem l
+        WHERE o.o_orderkey = l.l_orderkey
+        AND l.l_shipdate between '1998-11-11' and '1998-12-31';
+
+    EX 3:
+
+        SELECT o.o_orderpriority, c.c_name, c.c_address
+        FROM orders o, customer c, nation n
+        WHERE o.o_custkey = c.c_custkey
+        AND c.c_nationkey = n.n_nationkey
+        AND n.n_name = 'UNITED STATES'
+        AND c.c_acctbal > 9990;
+
+    EX 4:
+
+        SELECT c.c_name
+        FROM customer c, nation n
+        WHERE c.c_nationkey = n.n_nationkey
+        AND c.c_acctbal > 9990
+        AND c_mktsegment like '%AUTO%'
+        AND n.n_name = 'UNITED STATES';
+
+    EX 5:
+
+        SELECT c.c_name, o.o_totalprice
+        FROM customer c, orders o, nation n
+        WHERE c.c_nationkey = n.n_nationkey
+        AND o.o_custkey = c.c_custkey
+        AND n.n_name = 'BRAZIL';
